@@ -59,13 +59,12 @@ function BasePicker:remove_dups()
     self.results = filtered_results
 end
 
-function BasePicker:sort_results()
+function BasePicker.sort_results()
     local selected_python = path.current_python_path
     local current_file_dir = vim.fn.expand("%:p:h")
 
     log.debug("Calculating path similarity based on: '" .. current_file_dir .. "'")
     -- Normalize path by converting all separators to a common one (e.g., '/')
-    ---@diagnostic disable-next-line: redefined-local
     local function normalize_path(path)
         return path:gsub("\\", "/")
     end
@@ -87,8 +86,8 @@ function BasePicker:sort_results()
         return count
     end
 
-    log.debug("Sorting the results on path similarity.")
-    table.sort(self.results, function(a, b)
+    log.debug("Sorting telescope results on path similarity.")
+    table.sort(M.results, function(a, b)
         -- Check for 'selected_python' match
         local a_is_selected = a.path == selected_python
         local b_is_selected = b.path == selected_python
