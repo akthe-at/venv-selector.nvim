@@ -27,30 +27,6 @@ function TelescopePicker:get_sorter()
     return choices[config.user_settings.options.telescope_filter_type]
 end
 
----shorten the given path
----@param path string
----@param len integer
-local path_shortener = function(path, len)
-    local path_separator = "\\" or "/"
-    local components = {}
-
-    for component in string.gmatch(path, "[^" .. path_separator .. "]+") do
-        table.insert(components, component)
-    end
-
-    if #components <= len then
-        return path:gsub(path_separator, "/")
-    end
-
-    for i = 1, #components - len do
-        table.remove(components, 1)
-    end
-
-    local short_path = table.concat(components, "/")
-
-    return short_path
-end
-
 function TelescopePicker:make_entry_maker()
     local entry_display = require("telescope.pickers.entry_display")
 
@@ -97,7 +73,7 @@ function TelescopePicker:make_entry_maker()
 
     return function(entry)
         local icon = entry.icon
-        entry.value = path_shortener(entry.name, 2)
+        entry.value = entry.name
         entry.ordinal = entry.path
         entry.display = function(e)
             return displayer({
@@ -168,8 +144,8 @@ function TelescopePicker:open(in_progress)
                 if selected_entry ~= nil then
                     activated = venv.activate(config.user_settings.hooks, selected_entry)
                     if activated == true then
-                        path.add(path.get_base(path_shortener(selected_entry.path, 1)))
-                        path.update_python_dap(path_shortener(selected_entry.path, 1))
+                        path.add(path.get_base(selected_entry.path))
+                        path.update_python_dap(selected_entry.path)
                         path.save_selected_python(selected_entry.path)
 
                         if selected_entry.type == "anaconda" then
