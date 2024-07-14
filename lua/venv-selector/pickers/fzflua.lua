@@ -86,9 +86,8 @@ function FzfLuaPicker:open(in_progress)
     -- If the search is not in progress, sort the results
     if in_progress == false then
         self:sort_results()
+        local formatted_results = vim.tbl_map(self:make_entry_maker(), self.results)
     end
-
-    --local formatted_results = vim.tbl_map(self:make_entry_maker(), self.results)
 
     local opts = {
         prompt = title,
