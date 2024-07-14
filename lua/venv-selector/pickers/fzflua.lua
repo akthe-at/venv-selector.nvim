@@ -5,31 +5,6 @@ local venv = require("venv-selector.venv")
 local BasePicker = require("venv-selector.pickers.basepicker")
 local fzf_lua = require("fzf-lua")
 
----TODO: Make this configurable by the user for the pickers to save on length...maybe disable this if they want full length?
----shorten the given path
----@param path string
----@param len integer
-local path_shortener = function(path, len)
-    local path_separator = "\\" or "/"
-    local components = {}
-
-    for component in string.gmatch(path, "[^" .. path_separator .. "]+") do
-        table.insert(components, component)
-    end
-
-    if #components <= len then
-        return path:gsub(path_separator, "/")
-    end
-
-    for i = 1, #components - len do
-        table.remove(components, 1)
-    end
-
-    local short_path = table.concat(components, "/")
-
-    return short_path
-end
-
 -- Fzf-lua implementation
 local FzfLuaPicker = setmetatable({}, BasePicker)
 FzfLuaPicker.__index = FzfLuaPicker
@@ -77,36 +52,10 @@ function FzfLuaPicker.make_entry_maker(entry)
     return function(entry)
         local icon = draw_icons_for_types(entry)
         local highlight = hl_active_venv(entry)
-        local shortened_path = path_shortener(entry.path, 4)
-        return string.format("%s%s\27[0m %s %s", highlight, icon, "~/" .. shortened_path, entry.source)
+        local path = entry.path
+        return string.format("%s%s\27[0m %s %s", highlight, icon, path, entry.source)
     end
 end
-
--- function FzfLuaPicker:update_results()
---   -- Format the new results
---   local formatted_results = vim.tbl_map(self:make_entry_maker(), self.results)
---
---   -- Close the current fzf picker and open a new one with the updated results
---   vim.api.nvim_command 'q' -- Close the current fzf picker
---
---   local opts = {
---     prompt = 'Search Results> ',
---     actions = {
---       ['default'] = require('fzf-lua').actions.file_edit,
---       ['ctrl-y'] = function(selected, opts)
---         print('selected item:', selected[1])
---       end,
---     },
---   }
---
---   fzf_lua.fzf_exec(function(cb)
---     for _, result in ipairs(formatted_results) do
---       cb(result)
---     end
---     -- Signal EOF to close the named pipe and stop fzf's loading indicator
---     cb()
---   end, opts)
--- end
 
 function FzfLuaPicker:update_results() -- Sort the results
     self:sort_results()
@@ -124,21 +73,22 @@ function FzfLuaPicker:update_results() -- Sort the results
     }
 
     fzf_lua.fzf_exec(function(cb)
+        formatted_results = formatted_results or {} -- provide an empty table as default
         for _, result in ipairs(formatted_results) do
             cb(result)
         end
-        cb() -- EOF
+        cb() --Signal EOF to close the named pipe and stop fzf's loading ind
     end, opts)
 end
 
 function FzfLuaPicker:open(in_progress)
     local title = "Virtual environments (ctrl-r to refresh)"
     -- If the search is not in progress, sort the results
-    if not in_progress then
+    if in_progress == false then
         self:sort_results()
     end
 
-    local formatted_results = vim.tbl_map(self:make_entry_maker(), self.results)
+    --local formatted_results = vim.tbl_map(self:make_entry_maker(), self.results)
 
     local opts = {
         prompt = title,
@@ -184,6 +134,7 @@ function FzfLuaPicker:open(in_progress)
     }
 
     fzf_lua.fzf_exec(function(cb)
+        formatted_results = formatted_results or {} -- provide an empty table as default
         for _, result in ipairs(formatted_results) do
             cb(result)
         end
