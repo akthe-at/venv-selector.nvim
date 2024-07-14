@@ -184,6 +184,7 @@ M.default_settings = {
         on_telescope_result_callback = nil, -- callback function for modifying telescope results
         show_telescope_search_type = true, -- Shows which of the searches found which venv in telescope
         telescope_filter_type = "substring", -- When you type something in telescope, filter by "substring" or "character"
+        picker = "fzf-lua", -- "default" || "telescope" || "fzf-lua"
     },
     search = M.get_default_searches()(),
 }

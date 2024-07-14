@@ -91,7 +91,7 @@ local function run_search(opts)
                         rv.name = callback(line, rv.source)
                     end
 
-                    gui.insert_result(rv)
+                    gui:insert_result(rv)
                 end
             end
         elseif event == "stderr" and data then
@@ -106,9 +106,9 @@ local function run_search(opts)
             job_count = job_count - 1
             if job_count == 0 then
                 log.info("Searching finished.")
-                gui.remove_dups()
-                gui.sort_results()
-                gui.update_results()
+                gui:remove_dups()
+                gui:sort_results()
+                gui:update_results()
                 M.search_in_progress = false
             end
         end

@@ -20,7 +20,7 @@ function M.activate(hooks, selected_entry)
     local on_venv_activate_callback = config.user_settings.options.on_venv_activate_callback
 
     if python_path ~= nil then
-        log.debug("Telescope entry selected by user: ", selected_entry)
+        log.debug("Picker entry selected by user: ", selected_entry)
         local count = 0
         for _, hook in pairs(hooks) do
             count = count + hook(python_path)
